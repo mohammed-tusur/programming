@@ -1,0 +1,8 @@
+<Window x:Class="Contacts.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Contacts App" Height="300" Width="400">
+    <Grid>
+        <!-- UI elements will go here -->
+    </Grid>
+</Window>
