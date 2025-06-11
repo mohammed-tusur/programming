@@ -1,6 +1,12 @@
 
-src/View/obj
-src/View/bin
+src/Contacts/obj
+src/Contacts/bin
+
+/src/Contacts/bin
+src/Contacts/obj
+
+obj
+bin
 
 env
 myenv
