@@ -22,21 +22,43 @@
         <Grid Grid.Column="0" Background="#f8f8f8">
             <Grid Margin="8">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
+                    <!-- Search row -->
+                    <RowDefinition Height="*"/>
+                    <!-- Contacts list -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Buttons -->
                 </Grid.RowDefinitions>
 
+                <!-- Search Box - Now using Grid instead of StackPanel -->
+                <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <!-- "Find:" label -->
+                        <ColumnDefinition Width="*"/>
+                        <!-- Search box takes remaining space -->
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Find:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <TextBox Grid.Column="1" x:Name="SearchTextBox" 
+                     TextChanged="SearchTextBox_TextChanged"
+                     MinWidth="50"/>
+                    <!-- Ensure it doesn't collapse completely -->
+                </Grid>
+
                 <!-- Contacts List -->
-                <ListBox Grid.Row="0" ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedContact}" 
-                         DisplayMemberPath="Name" Margin="0,0,0,3"/>
+                <ListBox Grid.Row="1" x:Name="ContactsListBox" 
+                 ItemsSource="{Binding Contacts}" 
+                 SelectedItem="{Binding SelectedContact}"
+                 DisplayMemberPath="Name" Margin="0,0,0,3"/>
 
                 <!-- Buttons at the bottom -->
-                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,3,0,0">
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,3,0,0">
                     <Button Content="Add" Command="{Binding AddCommand}" Height="25" Width="70" Margin="3"/>
                     <Button Content="Edit" Command="{Binding EditCommand}" Height="25" Width="70" Margin="3" 
-                            IsEnabled="{Binding IsEditEnabled}"/>
+                    IsEnabled="{Binding IsEditEnabled}"/>
                     <Button Content="Remove" Command="{Binding RemoveCommand}" Height="25" Width="70" Margin="3" 
-                            IsEnabled="{Binding IsRemoveEnabled}"/>
+                    IsEnabled="{Binding IsRemoveEnabled}"/>
                 </StackPanel>
             </Grid>
         </Grid>
