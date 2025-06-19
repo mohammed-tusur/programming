@@ -1,0 +1,448 @@
+MainWindow.xaml.cs:
+using Contacts.Models;
+using Contacts.ViewModels;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace Contacts
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            DataContext = new MainViewModel();
+        }
+        // Search functionality
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (DataContext is MainViewModel vm)
+            {
+                var searchText = SearchTextBox.Text.ToLower();
+                ContactsListBox.Items.Filter = item =>
+                    item is Contact contact &&
+                    contact.Name?.ToLower().Contains(searchText) == true;
+            }
+        }
+
+    }
+}
+MainWindow.xaml:
+<Window x:Class="Contacts.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Contacts"
+        xmlns:converters="clr-namespace:Contacts.Converters"
+        mc:Ignorable="d"
+        Title="Contacts" Height="450" Width="800">
+    <Window.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="150"/>
+            <ColumnDefinition Width="3"/>
+            <ColumnDefinition Width="2*" MinWidth="300"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel (Contacts List) -->
+        <Grid Grid.Column="0" Background="#f8f8f8">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Search row -->
+                    <RowDefinition Height="*"/>
+                    <!-- Contacts list -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Buttons -->
+                </Grid.RowDefinitions>
+
+                <!-- Search Box - Now using Grid instead of StackPanel -->
+                <Grid Grid.Row="0" Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <!-- "Find:" label -->
+                        <ColumnDefinition Width="*"/>
+                        <!-- Search box takes remaining space -->
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Find:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <TextBox Grid.Column="1" x:Name="SearchTextBox" 
+                     TextChanged="SearchTextBox_TextChanged"
+                     MinWidth="50"/>
+                    <!-- Ensure it doesn't collapse completely -->
+                </Grid>
+
+                <!-- Contacts List -->
+                <ListBox Grid.Row="1" x:Name="ContactsListBox" 
+                 ItemsSource="{Binding Contacts}" 
+                 SelectedItem="{Binding SelectedContact}"
+                 DisplayMemberPath="Name" Margin="0,0,0,3"/>
+
+                <!-- Buttons at the bottom -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,3,0,0">
+                    <Button Content="Add" Command="{Binding AddCommand}" Height="25" Width="70" Margin="3"/>
+                    <Button Content="Edit" Command="{Binding EditCommand}" Height="25" Width="70" Margin="3" 
+                    IsEnabled="{Binding IsEditEnabled}"/>
+                    <Button Content="Remove" Command="{Binding RemoveCommand}" Height="25" Width="70" Margin="3" 
+                    IsEnabled="{Binding IsRemoveEnabled}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- GridSplitter -->
+        <GridSplitter Grid.Column="1" Width="3" Background="White" HorizontalAlignment="Stretch"/>
+
+        <!-- Right Panel (Contact Details) -->
+        <Grid Grid.Column="2" Background="White">
+            <Grid Margin="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Name -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,3">
+                    <TextBlock Text="Name:" Width="100" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding EditingContact.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+             Width="200" IsReadOnly="{Binding IsReadOnly}"/>
+                </StackPanel>
+
+                <!-- Phone Number -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,3">
+                    <TextBlock Text="Phone Number:" Width="100" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding EditingContact.PhoneNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+             Width="200" IsReadOnly="{Binding IsReadOnly}"/>
+                </StackPanel>
+
+                <!-- Email -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,3">
+                    <TextBlock Text="Email:" Width="100" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding EditingContact.Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+             Width="200" IsReadOnly="{Binding IsReadOnly}"/>
+                </StackPanel>
+
+                <!-- Apply Button -->
+                <Button Grid.Row="4" Content="Apply" Command="{Binding ApplyCommand}" 
+                        Width="75" Height="25" Margin="0,50,0,0"
+                        Visibility="{Binding IsApplyVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
+
+RelayCommand.cs:
+using System;
+using System.Windows.Input;
+
+namespace Contacts.ViewModels
+{
+    /// Implementation of ICommand that delegates execution to provided methods
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Predicate<object> _canExecute;
+
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        // ICommand implementation
+        public bool CanExecute(object parameter) => _canExecute?.Invoke(parameter) ?? true;
+
+        public void Execute(object parameter) => _execute(parameter);
+
+        // Automatically triggers CanExecute evaluation when conditions change
+        public event EventHandler CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
+    }
+}
+MainViewModel.cs:
+using Contacts.Models;
+using Contacts.Models.Services;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Input;
+
+namespace Contacts.ViewModels
+{
+    // Handles contact list operations and UI state
+    public class MainViewModel : INotifyPropertyChanged
+    {
+        private Contact? _selectedContact;
+        private Contact _editingContact;
+        private bool _isEditing;
+
+        public ObservableCollection<Contact> Contacts { get; } = new ObservableCollection<Contact>();
+
+        // Currently selected contact (cancels edits when changed)
+        public Contact? SelectedContact
+        {
+            get => _selectedContact;
+            set
+            {
+                if (_selectedContact != value)
+                {
+                    CancelEdit();
+                    _selectedContact = value;
+                    OnPropertyChanged(nameof(SelectedContact));
+                    OnPropertyChanged(nameof(IsEditEnabled));
+                    OnPropertyChanged(nameof(IsRemoveEnabled));
+                }
+            }
+        }
+
+        // Temporary contact during edits
+        public Contact? EditingContact
+        {
+            get => _editingContact;
+            set
+            {
+                _editingContact = value;
+                OnPropertyChanged(nameof(EditingContact));
+            }
+        }
+
+        // UI state properties
+        public bool IsReadOnly => !_isEditing;
+        public bool IsApplyVisible => _isEditing;
+        public bool IsEditEnabled => SelectedContact != null && !_isEditing;
+        public bool IsRemoveEnabled => SelectedContact != null && !_isEditing;
+
+        // Commands
+        public ICommand AddCommand { get; }
+        public ICommand EditCommand { get; }
+        public ICommand RemoveCommand { get; }
+        public ICommand ApplyCommand { get; }
+
+        public MainViewModel()
+        {
+            // Load saved contacts
+            foreach (var contact in ContactSerializer.LoadContacts())
+            {
+                Contacts.Add(contact);
+            }
+
+            AddCommand = new RelayCommand(_ => AddContact());
+            EditCommand = new RelayCommand(_ => EditContact(), _ => IsEditEnabled);
+            RemoveCommand = new RelayCommand(_ => RemoveContact(), _ => IsRemoveEnabled);
+            ApplyCommand = new RelayCommand(_ => ApplyChanges());
+        }
+
+        private void AddContact()
+        {
+            _isEditing = true;
+            EditingContact = new Contact(); // Start with empty contact
+            SelectedContact = null;
+            UpdateState();
+        }
+
+        private void EditContact()
+        {
+            if (SelectedContact != null)
+            {
+                _isEditing = true;
+                // Create editable copy
+                EditingContact = new Contact
+                {
+                    Name = SelectedContact.Name,
+                    PhoneNumber = SelectedContact.PhoneNumber,
+                    Email = SelectedContact.Email
+                };
+                UpdateState();
+            }
+        }
+
+        private void RemoveContact()
+        {
+            if (SelectedContact != null)
+            {
+                int index = Contacts.IndexOf(SelectedContact);
+                Contacts.Remove(SelectedContact);
+
+                // Select next contact or clear if empty
+                SelectedContact = Contacts.Count > 0
+                    ? Contacts[Math.Min(index, Contacts.Count - 1)]
+                    : null;
+
+                SaveContacts();
+            }
+        }
+
+        private void ApplyChanges()
+        {
+            if (!_isEditing || EditingContact == null || string.IsNullOrWhiteSpace(EditingContact.Name))
+                return;
+
+            if (SelectedContact == null) // Add new
+            {
+                var newContact = new Contact
+                {
+                    Name = EditingContact.Name,
+                    PhoneNumber = EditingContact.PhoneNumber,
+                    Email = EditingContact.Email
+                };
+                Contacts.Add(newContact);
+                SelectedContact = newContact;
+            }
+            else // Update existing
+            {
+                SelectedContact.Name = EditingContact.Name;
+                SelectedContact.PhoneNumber = EditingContact.PhoneNumber;
+                SelectedContact.Email = EditingContact.Email;
+            }
+
+            _isEditing = false;
+            EditingContact = null;
+            UpdateState();
+            SaveContacts();
+        }
+
+        private void CancelEdit()
+        {
+            _isEditing = false;
+            EditingContact = null;
+            UpdateState();
+        }
+
+        private void UpdateState()
+        {
+            OnPropertyChanged(nameof(IsReadOnly));
+            OnPropertyChanged(nameof(IsApplyVisible));
+            OnPropertyChanged(nameof(IsEditEnabled));
+            OnPropertyChanged(nameof(IsRemoveEnabled));
+        }
+
+        private void SaveContacts() => ContactSerializer.SaveContacts(Contacts.ToList());
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+}
+Contact.cs:
+
+using System.ComponentModel;
+
+namespace Contacts.Models
+{
+    public class Contact : INotifyPropertyChanged // Contact model implementing INotifyPropertyChanged for data binding
+    {
+        // Backing fields
+        private string? _name;
+        private string? _phoneNumber;
+        private string? _email;
+
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                OnPropertyChanged(nameof(Name));
+            }
+        }
+
+        public string? PhoneNumber
+        {
+            get => _phoneNumber;
+            set
+            {
+                _phoneNumber = value;
+                OnPropertyChanged(nameof(PhoneNumber));
+            }
+        }
+
+        public string? Email
+        {
+            get => _email;
+            set
+            {
+                _email = value;
+                OnPropertyChanged(nameof(Email));
+            }
+        }
+
+        // Property change notification event
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        /// Raises PropertyChanged event
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}
+ContactSerializer.cs:
+using Contacts.Models;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml.Serialization;
+
+namespace Contacts.Models.Services
+{
+    public static class ContactSerializer
+    {
+        private static readonly string FilePath = "contacts.xml";
+
+        // Loads contacts from XML file, returns empty list if file doesn't exist
+        public static List<Contact> LoadContacts()
+        {
+            if (!File.Exists(FilePath))
+                return new List<Contact>();
+
+            var serializer = new XmlSerializer(typeof(List<Contact>));
+            using (var reader = new StreamReader(FilePath))
+            {
+                return (List<Contact>)serializer.Deserialize(reader);
+            }
+        }
+
+        // Saves contacts to XML file
+        public static void SaveContacts(List<Contact> contacts)
+        {
+            var serializer = new XmlSerializer(typeof(List<Contact>));
+            using (var writer = new StreamWriter(FilePath))
+            {
+                serializer.Serialize(writer, contacts);
+            }
+        }
+    }
+}
+
+
+Converters/BooleanToVisibilityConverter.cs:
+using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Data;
+
+namespace Contacts.Converters
+{
+    // Converts bool to Visibility (Visible/Collapsed) and back
+    public class BooleanToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (value is bool && (bool)value) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value is Visibility visibility && visibility == Visibility.Visible;
+        }
+    }
+}
+
