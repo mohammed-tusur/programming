@@ -15,7 +15,7 @@
     <Window.Resources>
         <DataTemplate x:Key="contactTemplate">
             <DockPanel>
-                <Image Width="35" Height="35" VerticalAlignment="Top" Source="/Assets/user_icon.png"></Image>
+                <Image Width="34" Height="34" VerticalAlignment="Top" Source="/Assets/user_icon.png"></Image>
                 <StackPanel>
                     <TextBlock Text="{Binding Name}" FontWeight="DemiBold"></TextBlock>
                     <TextBlock Text="{Binding Phone}" FontSize="10"></TextBlock>
