@@ -8,18 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Controls\user_icon.png" />
-    <None Remove="user_icon1.png" />
-    <None Remove="favicon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ViewModel\ViewModel\ViewModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\favicon.ico" />
-    <Resource Include="Controls\user_icon.png" />
+    <Resource Include="Assets\user_icon.png" />
   </ItemGroup>
 
 </Project>
