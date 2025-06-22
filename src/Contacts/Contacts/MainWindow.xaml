@@ -6,16 +6,12 @@
         xmlns:local="clr-namespace:Contacts"
         xmlns:userControls="clr-namespace:View.Controls"
         mc:Ignorable="d"
-        Title="Contacts" 
-        Height="450" 
-        Width="800" 
-        Icon="/Assets/favicon.ico"
-        DataContext="{StaticResource MainVM}">
+        Title="Contacts" Height="450" Width="800" Icon="\Assets\favicon.ico">
 
     <Window.Resources>
         <DataTemplate x:Key="contactTemplate">
             <DockPanel>
-                <Image Width="34" Height="34" VerticalAlignment="Top" Source="/Assets/user_icon.png"></Image>
+                <Image Width="35" Height="36" VerticalAlignment="Top" Source="/Assets/user_icon.png"></Image>
                 <StackPanel>
                     <TextBlock Text="{Binding Name}" FontWeight="DemiBold"></TextBlock>
                     <TextBlock Text="{Binding Phone}" FontSize="10"></TextBlock>

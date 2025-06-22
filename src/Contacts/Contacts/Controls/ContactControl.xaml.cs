@@ -21,9 +21,9 @@ namespace View.Controls
         /// </summary>
         private void PhoneTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            string pattern = @"[^\d()+-]";  // Regex pattern to block unwanted characters
+            string pattern = @"[^\d()+-]";
             Regex regex = new Regex(pattern);
-            e.Handled = regex.IsMatch(e.Text);  // Block input if invalid characters detected
+            e.Handled = regex.IsMatch(e.Text);
         }
 
         /// <summary>
@@ -36,12 +36,10 @@ namespace View.Controls
                 e.CancelCommand();  // cancel if data isn't text
                 return;
             }
-
             string pattern = @"[^\d()+-]";  // same validation pattern as for direct input
             Regex regex = new Regex(pattern);
-            string pastedText = e.DataObject.GetData(DataFormats.Text).ToString();
 
-            if (regex.IsMatch(pastedText))
+            if (!regex.IsMatch((e.DataObject.GetData(DataFormats.Text)).ToString()))
             {
                 e.CancelCommand();  // cancel paste if invalid characters found
             }

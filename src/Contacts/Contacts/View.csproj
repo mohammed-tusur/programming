@@ -8,16 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="contacts_96x96.ico" />
+    <None Remove="Controls\user_icon.png" />
+    <None Remove="user_icon1.png" />
+    <None Remove="favicon.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <ProjectReference Include="..\ViewModel\ViewModel\ViewModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\user_icon.png" />
     <Resource Include="Assets\favicon.ico" />
+    <Resource Include="Controls\user_icon.png" />
   </ItemGroup>
 
 </Project>

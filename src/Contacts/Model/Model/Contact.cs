@@ -6,7 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace View.Model
+
+namespace Model
 {
     /// <summary>
     /// Stores and returns contact information.
@@ -14,26 +15,26 @@ namespace View.Model
     public class Contact : INotifyPropertyChanged, IDataErrorInfo
     {
         /// <summary>
-        /// Contact name.
+        /// Name
         /// </summary>
         private string _name { get; set; }
 
         /// <summary>
-        /// Phone number.
+        /// Phone number
         /// </summary>
         private string _phone { get; set; }
 
         /// <summary>
-        /// Email address.
+        /// Email
         /// </summary>
         private string _email { get; set; }
-
+        
         /// <summary>
-        /// Gets or sets the contact name.
+        /// Returns and creates name.
         /// </summary>
-        public string Name
+        public string Name 
         {
-            get
+            get 
             {
                 return _name;
             }
@@ -45,7 +46,7 @@ namespace View.Model
         }
 
         /// <summary>
-        /// Gets or sets the phone number.
+        /// Rerturns and creates a Phone number.
         /// </summary>
         public string Phone
         {
@@ -61,7 +62,7 @@ namespace View.Model
         }
 
         /// <summary>
-        /// Gets or sets the email address.
+        /// Returns and creates email.
         /// </summary>
         public string Email
         {
@@ -77,14 +78,13 @@ namespace View.Model
         }
 
         /// <summary>
-        /// Gets the error message.
+        /// Returns the error text.
         /// </summary>
         public string Error => "";
 
         /// <summary>
-        /// Gets the error message for the property with the given name.
+        /// Returns the error text.
         /// </summary>
-        /// <returns>Error message string.</returns>
         public string this[string propertyName]
         {
             get
@@ -122,18 +122,16 @@ namespace View.Model
         }
 
         /// <summary>
-        /// Creates an instance of the class without initialization.
+        ///  Creates an instance of the class without initialization.
         /// </summary>
         public Contact()
         {
+
         }
 
         /// <summary>
         /// Creates an instance of the class.
         /// </summary>
-        /// <param name="name">Contact name.</param>
-        /// <param name="phone">Phone number.</param>
-        /// <param name="email">Email address.</param>
         public Contact(string name, string phone, string email)
         {
             Name = name;
@@ -144,7 +142,6 @@ namespace View.Model
         /// <summary>
         /// Creates a copy of the class instance.
         /// </summary>
-        /// <param name="contact">Source object.</param>
         public Contact(Contact contact)
         {
             this.Name = contact.Name;
@@ -156,6 +153,7 @@ namespace View.Model
         /// Occurs when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
+
 
         /// <summary>
         /// Updates bound objects.

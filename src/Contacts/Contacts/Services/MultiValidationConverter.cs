@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace View.ViewModel
+namespace View.Services
 {
     /// <summary>
     /// Provides methods for converting boolean array values.
@@ -13,17 +17,6 @@ namespace View.ViewModel
         /// Converts an array of values to a boolean result.
         /// Returns true only if all input values are false.
         /// </summary>
-        /// <param name="values">The array of values to convert</param>
-        /// <param name="targetType">The type of the binding target property</param>
-        /// <param name="parameter">The converter parameter to use</param>
-        /// <param name="culture">The culture to use in the converter</param>
-        /// <returns>
-        /// false if any input value is true, 
-        /// true if all values are false or empty collection
-        /// </returns>
-        /// <exception cref="ArgumentException">
-        /// Thrown when any value is not a boolean type
-        /// </exception>
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values.Length != 0)
